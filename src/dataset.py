@@ -20,7 +20,6 @@ class ChurnDataset(Dataset):
 def load_dataset(dataset_path: str, test_size: float = 0.15, validation_size: float = 0.15, random_state: int = 67):
     df = pd.read_csv(dataset_path)
 
-    # monetary_value for now, will switch to log later
     x = df[["recency", "frequency", "monetary_value"]]
     y = df["churn"]
 

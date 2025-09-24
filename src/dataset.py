@@ -25,7 +25,7 @@ def load_dataset(dataset_path: str, test_size: float = 0.15, validation_size: fl
 
     # First split: train vs temp (val+test)
     x_train, x_temp, y_train, y_temp = train_test_split(
-        X, y, test_size=(test_size + validation_size), stratify=y, random_state=random_state
+        x, y, test_size=(test_size + validation_size), stratify=y, random_state=random_state
     )
 
     # Second split: validation vs test

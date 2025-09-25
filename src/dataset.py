@@ -18,6 +18,15 @@ class ChurnDataset(Dataset):
 
 
 def load_dataset(dataset_path: str, test_size: float = 0.15, validation_size: float = 0.15, random_state: int = 67):
+    """
+    Loading the saved dataset after eda and rfm feature engineering in the jupyter notebook.
+    :param dataset_path: Path to the dataset
+    :param test_size: Size of the test set
+    :param validation_size: Size of the validation set
+    :param random_state: Random seed for the train test validation splits
+    :return: None
+    """
+
     df = pd.read_csv(dataset_path)
 
     x = df[["recency", "frequency", "monetary_value"]]
@@ -34,6 +43,7 @@ def load_dataset(dataset_path: str, test_size: float = 0.15, validation_size: fl
         x_temp, y_temp, test_size=relative_test_size, stratify=y_temp, random_state=random_state
     )
 
+    # Scaling the features since monetary value and frequency have differing magnitudes
     scaler = StandardScaler()
     x_train_scaled = scaler.fit_transform(x_train)
     x_val_scaled = scaler.transform(x_val)

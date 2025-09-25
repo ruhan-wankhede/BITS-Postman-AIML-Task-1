@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 
 from models import LogisticRegressionModel
-
+from tqdm import tqdm
 
 def train_logistic_regression(train_dataset, val_dataset,input_dim, epochs=50, batch_size=32, lr=0.001, device=None) -> LogisticRegressionModel:
     """
@@ -40,7 +40,7 @@ def train_logistic_regression(train_dataset, val_dataset,input_dim, epochs=50, b
         model.train()
         epoch_loss = 0.0
 
-        for batch_x, batch_y in train_loader:
+        for batch_x, batch_y in tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}", leave=True):
             batch_x, batch_y = batch_x.to(device), batch_y.to(device).view(-1, 1)
 
             optimizer.zero_grad()
@@ -51,7 +51,7 @@ def train_logistic_regression(train_dataset, val_dataset,input_dim, epochs=50, b
 
             epoch_loss += loss.item()
 
-        # Validation
+        # Validation every 10 epochs
         if (epoch + 1) % 10 == 0:
             model.eval()
             with torch.no_grad():

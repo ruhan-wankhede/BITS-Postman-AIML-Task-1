@@ -22,7 +22,7 @@ def run_with_training():
     print(f"Using device: {device}")
 
     # Load datasets
-    train_dataset, val_dataset, test_dataset = load_dataset("data/customer_churn_features.csv")
+    train_dataset, val_dataset, test_dataset = load_dataset("data/merged_orders.csv")
 
     # Train Logistic Regression (PyTorch)
     input_dim = train_dataset.x.shape[1]
@@ -55,7 +55,7 @@ def run_existing():
     print(f"Using device: {device}")
 
     # Load datasets
-    _, _, test_dataset = load_dataset("data/customer_churn_features.csv")
+    _, _, test_dataset = load_dataset("data/merged_orders.csv")
     logistic_path = "models/logistic_regression.pt"
     random_forest_path = "models/random_forest.pkl"
 

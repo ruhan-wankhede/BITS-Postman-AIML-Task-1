@@ -27,21 +27,43 @@ def load_dataset(dataset_path: str, test_size: float = 0.15, validation_size: fl
     :return: None
     """
 
-    df = pd.read_csv(dataset_path)
+    df = pd.read_csv(dataset_path, parse_dates=["order_purchase_timestamp"])
 
-    x = df[["recency", "frequency", "monetary_value"]]
-    y = df["churn"]
+    #  Split customers first to avoid data leakage
+    unique_customers = df["customer_unique_id"].unique()
+    train_ids, temp_ids = train_test_split(unique_customers, test_size=(test_size + validation_size),
+                                           random_state=random_state)
+    val_ids, test_ids = train_test_split(temp_ids, test_size=test_size / (test_size + validation_size),
+                                         random_state=random_state)
 
-    # First split: train vs temp (val+test)
-    x_train, x_temp, y_train, y_temp = train_test_split(
-        x, y, test_size=(test_size + validation_size), stratify=y, random_state=random_state
-    )
+    train_orders = df[df["customer_unique_id"].isin(train_ids)]
+    val_orders = df[df["customer_unique_id"].isin(val_ids)]
+    test_orders = df[df["customer_unique_id"].isin(test_ids)]
 
-    # Second split: validation vs test
-    relative_test_size = test_size / (test_size + validation_size)
-    x_val, x_test, y_val, y_test = train_test_split(
-        x_temp, y_temp, test_size=relative_test_size, stratify=y_temp, random_state=random_state
-    )
+    reference_date = train_orders["order_purchase_timestamp"].max()
+
+    def build_features(order_df, ref_date):
+        features = (
+            order_df.groupby("customer_unique_id")
+            .agg(
+                last_purchase=("order_purchase_timestamp", "max"),
+                frequency=("order_id", "count"),
+                monetary_value=("payment_value", "sum")
+            )
+            .reset_index()
+        )
+        features["recency"] = (ref_date - features["last_purchase"]).dt.days
+        features["churn"] = (features["recency"] > 180).astype(int)
+        return features[["customer_unique_id", "recency", "frequency", "monetary_value", "churn"]]
+
+    train_features = build_features(train_orders, reference_date)
+    val_features = build_features(val_orders, reference_date)
+    test_features = build_features(test_orders, reference_date)
+
+    x_train, y_train = train_features[["recency", "frequency", "monetary_value"]], train_features["churn"]
+    x_val, y_val = val_features[["recency", "frequency", "monetary_value"]], val_features["churn"]
+    x_test, y_test = test_features[["recency", "frequency", "monetary_value"]], test_features["churn"]
+
 
     # Scaling the features since monetary value and frequency have differing magnitudes
     scaler = StandardScaler()

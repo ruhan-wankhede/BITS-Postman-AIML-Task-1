@@ -6,10 +6,10 @@ from torch.utils.data import DataLoader
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 
-from models import LogisticRegressionModel
+from src.models import LogisticRegressionModel
 from tqdm import tqdm
 
-def train_logistic_regression(train_dataset, val_dataset,input_dim, epochs=50, batch_size=32, lr=0.001, device=None) -> LogisticRegressionModel:
+def train_logistic_regression(train_dataset, val_dataset,input_dim, epochs=10, batch_size=16, lr=0.001, device=None) -> LogisticRegressionModel:
     """
     Train the logistic regression model
     :param train_dataset: the training dataset
@@ -52,7 +52,7 @@ def train_logistic_regression(train_dataset, val_dataset,input_dim, epochs=50, b
             epoch_loss += loss.item()
 
         # Validation every 10 epochs
-        if (epoch + 1) % 10 == 0:
+        if (epoch + 1) % 5 == 0:
             model.eval()
             with torch.no_grad():
                 for val_x, val_y in val_loader:  # only 1 batch here
@@ -79,8 +79,8 @@ def train_random_forest(train_dataset, val_dataset) -> RandomForestClassifier:
     y_val = val_dataset.y.cpu().numpy()
 
     clf = RandomForestClassifier(
-        n_estimators=200,
-        max_depth=10,
+        n_estimators=100,
+        max_depth=5,
         class_weight="balanced",
         random_state=67,
         n_jobs=-1

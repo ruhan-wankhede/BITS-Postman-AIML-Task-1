@@ -17,9 +17,10 @@ class ChurnDataset(Dataset):
         return self.x[idx], self.y[idx]
 
 
-def load_dataset(dataset_path: str, test_size: float = 0.15, validation_size: float = 0.15, random_state: int = 67):
+def load_dataset(dataset_path: str, test_size: float = 0.15, validation_size: float = 0.15, random_state: int = 67, include_recency: bool = True):
     """
     Loading the saved dataset after eda and rfm feature engineering in the jupyter notebook.
+    :param include_recency: whether to include recency as a feature or not
     :param dataset_path: Path to the dataset
     :param test_size: Size of the test set
     :param validation_size: Size of the validation set
@@ -60,9 +61,14 @@ def load_dataset(dataset_path: str, test_size: float = 0.15, validation_size: fl
     val_features = build_features(val_orders, reference_date)
     test_features = build_features(test_orders, reference_date)
 
-    x_train, y_train = train_features[["recency", "frequency", "monetary_value"]], train_features["churn"]
-    x_val, y_val = val_features[["recency", "frequency", "monetary_value"]], val_features["churn"]
-    x_test, y_test = test_features[["recency", "frequency", "monetary_value"]], test_features["churn"]
+    if include_recency:
+        x_train, y_train = train_features[["recency", "frequency", "monetary_value"]], train_features["churn"]
+        x_val, y_val = val_features[["recency", "frequency", "monetary_value"]], val_features["churn"]
+        x_test, y_test = test_features[["recency", "frequency", "monetary_value"]], test_features["churn"]
+    else:
+        x_train, y_train = train_features[["frequency", "monetary_value"]], train_features["churn"]
+        x_val, y_val = val_features[["frequency", "monetary_value"]], val_features["churn"]
+        x_test, y_test = test_features[["frequency", "monetary_value"]], test_features["churn"]
 
 
     # Scaling the features since monetary value and frequency have differing magnitudes

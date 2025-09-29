@@ -9,7 +9,7 @@ from sklearn.metrics import classification_report, accuracy_score
 from src.models import LogisticRegressionModel
 from tqdm import tqdm
 
-def train_logistic_regression(train_dataset, val_dataset,input_dim, epochs=10, batch_size=16, lr=0.001, device=None) -> LogisticRegressionModel:
+def train_logistic_regression(train_dataset, val_dataset,input_dim, epochs=20, batch_size=32, lr=0.001, device=None) -> LogisticRegressionModel:
     """
     Train the logistic regression model
     :param train_dataset: the training dataset

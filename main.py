@@ -22,7 +22,7 @@ def run_with_training():
     print(f"Using device: {device}")
 
     # Load datasets
-    train_dataset, val_dataset, test_dataset = load_dataset("data/merged_orders.csv")
+    train_dataset, val_dataset, test_dataset = load_dataset("data/merged_orders.csv", include_recency=True)
 
     # Train Logistic Regression (PyTorch)
     input_dim = train_dataset.x.shape[1]
